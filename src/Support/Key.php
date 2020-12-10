@@ -1,9 +1,11 @@
 <?php
 
 
-namespace Imdhemy\Redis;
+namespace Imdhemy\Redis\Support;
 
-class Key
+use Imdhemy\Redis\Contracts\Key as KeyContract;
+
+class Key implements KeyContract
 {
     /**
      * @var string

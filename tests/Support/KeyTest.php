@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests;
+namespace Tests\Support;
 
-use Imdhemy\Redis\Key;
+use Imdhemy\Redis\Support\Key;
 use PHPUnit\Framework\TestCase;
 
 class KeyTest extends TestCase
