@@ -1,6 +1,7 @@
 <?php
 
-namespace Imdhemy\Redis\Contracts;
+
+namespace Imdhemy\Redis\Contracts\Support;
 
 interface Key
 {

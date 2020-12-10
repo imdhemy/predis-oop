@@ -3,7 +3,7 @@
 
 namespace Imdhemy\Redis\Support;
 
-use Imdhemy\Redis\Contracts\Key as KeyContract;
+use Imdhemy\Redis\Contracts\Support\Key as KeyContract;
 
 class Key implements KeyContract
 {
