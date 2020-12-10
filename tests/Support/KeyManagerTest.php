@@ -2,6 +2,7 @@
 
 namespace Tests\Support;
 
+use ArrayAccess;
 use DateTime;
 use Imdhemy\Redis\Exceptions\KeyException;
 use Imdhemy\Redis\Support\Key;
@@ -77,7 +78,7 @@ class KeyManagerTest extends TestCase
      */
     public function test_exists()
     {
-        $key = new Key('redis' . time());
+        $key = new Key('redis' . (time() + rand(0, 100)));
         $this->assertFalse($this->keys->exists($key));
 
         $this->client->set($key, 'foo');
@@ -113,5 +114,15 @@ class KeyManagerTest extends TestCase
         $key = new Key('redis' . time());
         $this->client->set($key, 'foo');
         $this->assertTrue($this->keys->expireAtDatetime($key, new DateTime()));
+    }
+
+    /**
+     * @test
+     */
+    public function test_matches()
+    {
+        $result = $this->keys->match('redis*');
+        $this->assertInstanceOf(ArrayAccess::class, $result);
+        $this->assertInstanceOf(Key::class, $result->first());
     }
 }

@@ -3,7 +3,9 @@
 
 namespace Imdhemy\Redis\Support;
 
+use ArrayAccess;
 use DateTime;
+use Illuminate\Support\Collection;
 use Imdhemy\Redis\Contracts\Support\Key;
 use Imdhemy\Redis\Exceptions\KeyException;
 use Predis\ClientInterface;
@@ -50,7 +52,7 @@ class KeyManager
     public function dump(Key $key): string
     {
         $dump = $this->client->dump($key);
-        if (!is_null($dump)) {
+        if (! is_null($dump)) {
             return $dump;
         }
 
@@ -67,6 +69,7 @@ class KeyManager
     {
         try {
             $result = $this->client->restore($key, $ttl, $dump);
+
             return strtolower($result) === 'ok';
         } catch (ServerException $exception) {
             throw KeyException::restoreErrorKeyExists($key);
@@ -110,5 +113,29 @@ class KeyManager
     public function expireAtDatetime(Key $key, DateTime $dateTime): bool
     {
         return $this->expireAtTimestamp($key, $dateTime->getTimestamp());
+    }
+
+    /**
+     * @param string $pattern
+     * @return ArrayAccess|Key[]|Collection
+     */
+    public function match(string $pattern): ArrayAccess
+    {
+        $result = $this->client->keys($pattern);
+        $collection = new Collection();
+        foreach ($result as $key) {
+            $collection->add(new \Imdhemy\Redis\Support\Key($key));
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param string $pattern
+     * @return ArrayAccess|Key[]|Collection
+     */
+    public function keys(string $pattern): ArrayAccess
+    {
+        return $this->match($pattern);
     }
 }
