@@ -10,7 +10,7 @@ class Key implements KeyContract
     /**
      * @var string
      */
-    protected $value;
+    private $value;
 
     /**
      * @var string
