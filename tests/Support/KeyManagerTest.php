@@ -4,6 +4,7 @@ namespace Tests\Support;
 
 use ArrayAccess;
 use DateTime;
+use Imdhemy\Redis\Contracts\DataTypes\RedisString;
 use Imdhemy\Redis\Exceptions\KeyException;
 use Imdhemy\Redis\Support\Key;
 use Imdhemy\Redis\Support\KeyManager;
@@ -31,7 +32,8 @@ class KeyManagerTest extends TestCase
     public function test_delete()
     {
         $key = new Key('redis');
-        $this->assertIsNumeric($this->keys->delete($key));
+        $this->client->set($key, 'foo_bar');
+        $this->assertTrue($this->keys->delete($key));
     }
 
     /**
@@ -124,5 +126,115 @@ class KeyManagerTest extends TestCase
         $result = $this->keys->match('redis*');
         $this->assertInstanceOf(ArrayAccess::class, $result);
         $this->assertInstanceOf(Key::class, $result->first());
+    }
+
+    /**
+     * @test
+     */
+    public function test_persist()
+    {
+        $key = new Key('foo');
+        $this->client->set($key, 'bar');
+        $keys = new KeyManager($this->client);
+        $keys->expireAtDatetime($key, (new DateTime())->modify('+1 day'));
+        $this->assertNotEquals(-1, $this->client->ttl($key));
+        $this->assertTrue($keys->persist($key));
+        $this->assertEquals(-1, $this->client->ttl($key));
+    }
+
+    /**
+     * @test
+     */
+    public function test_p_expire()
+    {
+        $keys = new KeyManager($this->client);
+        $key = new Key('foo');
+        $this->client->set($key, 'bar');
+        $keys->pExpire($key, 1000);
+        sleep(1);
+        $this->assertEquals(-2, $this->client->ttl($key));
+    }
+
+    /**
+     * @test
+     */
+    public function test_p_expire_at()
+    {
+        $keys = new KeyManager($this->client);
+        $key = new Key('foo');
+        $this->client->set($key, 'bar');
+        $keys->pExpireAt($key, (new DateTime())->modify('+1 day')->getTimestamp() * 1000);
+        $this->assertGreaterThan(0, $this->client->ttl($key));
+    }
+
+    /**
+     * @test
+     */
+    public function test_p_ttl()
+    {
+        $keys = new KeyManager($this->client);
+        $key = new Key('myKey' . time());
+        $this->assertEquals(-2, $keys->pTTl($key));
+        $this->client->set($key, 'foo_bar');
+        $keys->pExpire($key, 1000 * 1000);
+        $this->assertGreaterThan(-2, $keys->pTTl($key));
+    }
+
+    /**
+     * @test
+     */
+    public function test_random_key()
+    {
+        $keys = new KeyManager($this->client);
+        $this->assertInstanceOf(Key::class, $keys->randomKey());
+    }
+
+    /**
+     * @test
+     */
+    public function test_rename()
+    {
+        $keys = new KeyManager($this->client);
+        $key = new Key('myKey');
+        $this->client->set($key, 'hello');
+        $newKey = new Key('myMotherKey');
+        $response = $keys->rename($key, $newKey);
+        $this->assertEquals($newKey, $response);
+        $keys->delete($newKey);
+    }
+
+    /**
+     * @test
+     */
+    public function test_rename_nx()
+    {
+        $keys = new KeyManager($this->client);
+        $key = new Key('redis:' . time());
+        $this->client->set($key, 'foo_bar');
+        $target = new Key('new_name');
+        $this->assertTrue($keys->renameIfAvailable($key, $target));
+        $keys->delete($target);
+    }
+    
+    /**
+     * @test
+     */
+    public function test_ttl()
+    {
+        $keys = new KeyManager($this->client);
+        $key = new Key('redis:' . time());
+        $this->client->set($key, 'foo_bar');
+        $this->assertEquals(-1, $keys->ttl($key));
+    }
+
+    /**
+     * @test
+     */
+    public function test_type()
+    {
+        $keys = new KeyManager($this->client);
+        $key = new Key('redis:' . time());
+        $this->client->set($key, 'foo_bar');
+        $this->assertEquals(RedisString::class, $keys->type($key));
     }
 }
