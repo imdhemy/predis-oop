@@ -116,12 +116,12 @@ class KeyManager
 
     /**
      * @param Key $key
-     * @param int $second
+     * @param int $seconds
      * @return bool
      */
-    public function expire(Key $key, int $second): bool
+    public function expire(Key $key, int $seconds): bool
     {
-        return $this->client->expire($key, $second);
+        return $this->client->expire($key, $seconds);
     }
 
     /**
@@ -288,5 +288,43 @@ class KeyManager
         }
 
         throw KeyException::getTypeNotFound($key);
+    }
+
+    /**
+     * @param Key $key
+     * @param int $seconds
+     * @return bool
+     */
+    public function setTTL(Key $key, int $seconds): bool
+    {
+        return $this->expire($key, $seconds);
+    }
+
+    /**
+     * @param Key $key
+     * @return int
+     */
+    public function getTTL(Key $key): int
+    {
+        return $this->ttl($key);
+    }
+
+    /**
+     * @param Key $key
+     * @param int $millisecond
+     * @return bool
+     */
+    public function setTTLMs(Key $key, int $millisecond): bool
+    {
+        return $this->pExpire($key, $millisecond);
+    }
+
+    /**
+     * @param Key $key
+     * @return int
+     */
+    public function getTTLMs(Key $key): int
+    {
+        return $this->pTTl($key);
     }
 }

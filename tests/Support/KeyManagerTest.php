@@ -215,7 +215,7 @@ class KeyManagerTest extends TestCase
         $this->assertTrue($keys->renameIfAvailable($key, $target));
         $keys->delete($target);
     }
-    
+
     /**
      * @test
      */
@@ -236,5 +236,47 @@ class KeyManagerTest extends TestCase
         $key = new Key('redis:' . time());
         $this->client->set($key, 'foo_bar');
         $this->assertEquals(RedisString::class, $keys->type($key));
+    }
+
+    /**
+     * @test
+     */
+    public function test_set_ttl()
+    {
+        $key = new Key('redis' . time());
+        $this->client->set($key, 'foo_bar');
+        $this->assertTrue($this->keys->setTTL($key, 1));
+    }
+
+    /**
+     * @test
+     */
+    public function test_get_ttl()
+    {
+        $key = new Key('redis' . time());
+        $this->client->set($key, 'foo_bar');
+        $this->keys->setTTL($key, 1);
+        $this->assertEquals(1, $this->keys->getTTL($key));
+    }
+
+    /**
+     * @test
+     */
+    public function test_set_ttl_ms()
+    {
+        $key = new Key('redis' . time());
+        $this->client->set($key, 'foo_bar');
+        $this->assertTrue($this->keys->setTTLMs($key, 1000));
+    }
+
+    /**
+     * @test
+     */
+    public function test_get_ttl_ms()
+    {
+        $key = new Key('redis' . time());
+        $this->client->set($key, 'foo_bar');
+        $this->keys->setTTLMs($key, 1000);
+        $this->assertEquals(1000, $this->keys->getTTLMs($key));
     }
 }
