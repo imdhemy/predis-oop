@@ -18,8 +18,15 @@ use Predis\ClientInterface;
 use Predis\Response\ServerException;
 use Predis\Response\Status;
 
+/**
+ * Class KeyManager
+ * @package Imdhemy\Redis\Support
+ */
 class KeyManager
 {
+    /**
+     * Data types
+     */
     const DATA_TYPES = [
         'string' => RedisString::class,
         'list' => RedisList::class,
@@ -28,6 +35,7 @@ class KeyManager
         'hash' => RedisHashMap::class,
         'stream' => RedisStream::class,
     ];
+    
     /**
      * @var ClientInterface
      */
@@ -42,6 +50,10 @@ class KeyManager
         $this->client = $client;
     }
 
+    /**
+     * @param Key $key
+     * @return bool
+     */
     public function del(Key $key): bool
     {
         return $this->client->del($key);
@@ -81,7 +93,7 @@ class KeyManager
     public function dump(Key $key): string
     {
         $dump = $this->client->dump($key);
-        if (! is_null($dump)) {
+        if (!is_null($dump)) {
             return $dump;
         }
 
