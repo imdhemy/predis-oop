@@ -93,7 +93,7 @@ class KeyManager
     public function dump(Key $key): string
     {
         $dump = $this->client->dump($key);
-        if (!is_null($dump)) {
+        if (! is_null($dump)) {
             return $dump;
         }
 
