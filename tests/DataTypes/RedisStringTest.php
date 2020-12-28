@@ -5,7 +5,6 @@ namespace Tests\DataTypes;
 use Imdhemy\Redis\DataTypes\RedisString;
 use Tests\TestCase;
 
-
 class RedisStringTest extends TestCase
 {
     /**

@@ -31,6 +31,7 @@ class TestCase extends BaseTestCase
     protected function createKey(?string $name = null): KeyContract
     {
         $name = $name ?? "redis_key_" . time();
+
         return new Key($name);
     }
 }
