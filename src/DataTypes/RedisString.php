@@ -129,16 +129,16 @@ class RedisString implements StringContract
     }
 
     /**
-     * @param int|null $start
-     * @param int|null $end
+     * @param int $start
+     * @param int $end
      * @return int
      */
-    public function bitCount(?int $start = null, ?int $end = null): int
+    public function bitCount(int $start = 0, int $end = -1): int
     {
         if (is_numeric($start) && is_numeric($end)) {
             return $this->client->bitcount($this->key, $start, $end);
         }
 
-        return $this->client->bitcount($this->key);
+        return $this->client->bitcount($this->key, 0, -1);
     }
 }

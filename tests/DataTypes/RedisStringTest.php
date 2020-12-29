@@ -24,7 +24,7 @@ class RedisStringTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->key = $this->createKey('myKey');
+        $this->key = $this->createKey();
         $this->str = new RedisString($this->client, $this->key);
     }
 
