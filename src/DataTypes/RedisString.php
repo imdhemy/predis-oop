@@ -9,6 +9,15 @@ use Predis\ClientInterface;
 
 class RedisString implements StringContract
 {
+    const SET = 'SET';
+    const GET = 'GET';
+    const INCRBY = 'INCRBY';
+    const OVERFLOW = 'OVERFLOW';
+
+    const WRAP = 'WRAP';
+    const SAT = 'SAT';
+    const FAIL = 'FAIL';
+    
     /**
      * @var ClientInterface
      */
@@ -136,5 +145,68 @@ class RedisString implements StringContract
     public function bitCount(int $start = 0, int $end = -1): int
     {
         return $this->client->bitcount($this->key, $start, $end);
+    }
+
+    /**
+     * @param string $type
+     * @param string $offset
+     * @param string $value
+     * @return array|null
+     */
+    public function bitFieldSet(string $type, string $offset, string $value): ?array
+    {
+        return $this->client->bitfield($this->key, self::SET, $type, $offset, $value);
+    }
+
+    /**
+     * @param string $type
+     * @param string $offset
+     * @param string $overflowControl
+     * @return array|null
+     */
+    public function bitFieldGet(string $type, string $offset, string $overflowControl = self::WRAP): ?array
+    {
+        return $this->client->bitfield(
+            $this->key,
+            self::GET,
+            $type,
+            $offset,
+            self::OVERFLOW,
+            $overflowControl
+        );
+    }
+
+    /**
+     * @param string $type
+     * @param string $offset
+     * @param string $increment
+     * @param string $overflowControl
+     * @return array|null
+     */
+    public function bitFieldIncrementBy(
+        string $type,
+        string $offset,
+        string $increment,
+        string $overflowControl = self::WRAP
+    ):
+    ?array {
+        return $this->client->bitfield(
+            $this->key,
+            self::INCRBY,
+            $type,
+            $offset,
+            $increment,
+            self::OVERFLOW,
+            $overflowControl
+        );
+    }
+
+    /**
+     * @param string ...$arguments
+     * @return array|null
+     */
+    public function bitField(...$arguments): ?array
+    {
+        return $this->client->bitfield($this->key, ...$arguments);
     }
 }

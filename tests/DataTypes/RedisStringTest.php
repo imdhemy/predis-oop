@@ -50,4 +50,14 @@ class RedisStringTest extends TestCase
         $this->assertEquals(4, $this->str->bitCount(0, 0));
         $this->assertEquals(6, $this->str->bitCount(1, 1));
     }
+
+    /**
+     * @test
+     */
+    public function test_bit_field()
+    {
+        $this->assertEquals([0], $this->str->bitFieldSet('u8', '#0', 22));
+        $this->assertEquals([22], $this->str->bitFieldGet('u8', '#0'));
+        $this->assertEquals([27], $this->str->bitFieldIncrementBy('u8', '#0', 5));
+    }
 }
